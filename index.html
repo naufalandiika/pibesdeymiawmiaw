@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>happy birthday mita!</title>
+    <!-- Google Fonts + Premium Feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- canvas-confetti for celebration -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none; /* sedikit premium feel, tapi teks tetap bisa dipilih */
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 10% 20%, rgba(255, 245, 240, 1) 0%, rgba(255, 235, 225, 1) 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        /* Glassmorphism premium card */
+        .glass-card {
+            background: rgba(255, 250, 245, 0.92);
+            backdrop-filter: blur(2px);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 245, 0.6);
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 2rem 2rem 2.5rem;
+        }
+
+        .screen {
+            transition: opacity 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* typography */
+        h1, h2 {
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .premium-title {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #B8735C, #D9A17E);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.75rem;
+        }
+
+        .sub {
+            color: #7F5A4B;
+            font-size: 0.9rem;
+            letter-spacing: 0.3px;
+            border-left: 3px solid #E7B89C;
+            padding-left: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        /* password area */
+        .password-container {
+            text-align: center;
+        }
+
+        .lock-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            background: #FFFBF8;
+            border: 1.5px solid #F2DFD0;
+            border-radius: 2rem;
+            font-size: 1rem;
+            font-family: 'Inter', monospace;
+            transition: all 0.2s;
+            text-align: center;
+            letter-spacing: 1px;
+            margin: 1.2rem 0 0.8rem;
+            outline: none;
+            color: #4A2E24;
+        }
+
+        .password-input:focus {
+            border-color: #D9A17E;
+            box-shadow: 0 0 0 3px rgba(217, 161, 126, 0.2);
+        }
+
+        .btn-premium {
+            background: #E7B89C;
+            border: none;
+            padding: 0.9rem 1.8rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #2D1F18;
+            cursor: pointer;
+            transition: all 0.25s;
+            width: 100%;
+            font-family: inherit;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .btn-premium:hover {
+            background: #D9A17E;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -12px rgba(183, 112, 76, 0.4);
+        }
+
+        .error-msg {
+            color: #C45C4A;
+            font-size: 0.8rem;
+            margin-top: 0.7rem;
+            font-weight: 500;
+        }
+
+        /* typing area - letter */
+        .letter-container {
+            background: rgba(255, 248, 240, 0.7);
+            border-radius: 1.8rem;
+            padding: 1.6rem;
+            margin: 1.5rem 0 1rem;
+            border: 1px solid rgba(231, 184, 156, 0.4);
+            box-shadow: inset 0 1px 2px #fff9f4, 0 8px 20px rgba(0,0,0,0.02);
+        }
+
+        .typing-area {
+            font-family: 'Inter', system-ui;
+            font-size: 0.98rem;
+            line-height: 1.65;
+            color: #3A2A22;
+            white-space: pre-wrap;
+            word-break: break-word;
+            min-height: 280px;
+            font-weight: 450;
+            letter-spacing: 0.2px;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2rem;
+            background-color: #D9A17E;
+            vertical-align: middle;
+            margin-left: 2px;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* candle interaction */
+        .candle-card {
+            background: #FFF6EF;
+            border-radius: 2rem;
+            padding: 1.2rem;
+            text-align: center;
+            margin: 1rem 0 1rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 1px solid #F6E2D4;
+            box-shadow: 0 6px 12px -10px rgba(0,0,0,0.1);
+        }
+
+        .candle-icon {
+            font-size: 4rem;
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.1));
+            transition: transform 0.2s ease;
+            display: inline-block;
+        }
+
+        .candle-card:hover .candle-icon {
+            transform: scale(1.02);
+        }
+
+        .candle-text {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #A66A4E;
+            margin-top: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* emotional peak + closing */
+        .emotional-message {
+            background: linear-gradient(120deg, #FFF2E8, #FFEADE);
+            border-radius: 1.8rem;
+            padding: 1.4rem;
+            margin: 1.2rem 0 0.8rem;
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            color: #B45F3B;
+            border-left: 5px solid #E7B89C;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+
+        .soft-closing {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #B48A6E;
+            letter-spacing: 0.3px;
+            margin-top: 1rem;
+            font-weight: 400;
+            border-top: 1px dashed #F0DDCE;
+            padding-top: 1rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* misc */
+        hr {
+            margin: 1rem 0;
+            border: none;
+            height: 1px;
+            background: linear-gradient(to right, #F0DDCE, transparent);
+        }
+
+        .tiny-note {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 1rem;
+            color: #C9AB92;
+        }
+
+        button {
+            background: none;
+            border: none;
+        }
+        @media (max-width: 550px) {
+            .glass-card {
+                padding: 1.5rem;
+            }
+            .premium-title {
+                font-size: 1.5rem;
+            }
+            .typing-area {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="glass-card" id="appWrapper">
+    <!-- 1. PASSWORD SCREEN (Private & Personal) -->
+    <div id="passwordScreen" class="screen password-container">
+        <div class="lock-icon">🔒</div>
+        <h1 class="premium-title">HAIII MITAAAAA❤️</h1>
+        <div class="sub">untuk memastikan bayik aku yang akses, masukin kode rahasia dulu yaaa..</div>
+        <input type="password" id="passwordInput" class="password-input" placeholder="masukin kodenya disini!" autocomplete="off">
+        <button id="submitPasswordBtn" class="btn-premium">lesgowww ➔</button>
+        <div id="passwordError" class="error-msg"></div>
+        <div class="tiny-note"> hint: ayah & mama mau kemana bulan inii? </div>
+    </div>
+
+    <!-- 2. MAIN CONTENT (setelah password benar) -->
+    <div id="mainScreen" class="screen hidden">
+        <!-- selamat ulang tahun sayangku! -->
+        <div style="text-align: left;">
+            <h2 class="premium-title" style="font-size: 1.6rem;"> selamat ulang tahun sayangku!</h2>
+            <div class="sub">💌 untuk bayik kecilnya akuu <3 </div>
+        </div>
+
+        <!-- Typing effect area -->
+        <div class="letter-container">
+            <div id="typingArea" class="typing-area"></div>
+        </div>
+
+        <!-- Lilin interaksi (akan muncul setelah typing selesai) -->
+        <div id="candleContainer" class="candle-card hidden">
+            <div id="candleClickZone" style="cursor: pointer;">
+                <span id="candleEmoji" class="candle-icon">🕯️</span>
+                <div class="candle-text">tiup lilinnya di sini ✨</div>
+            </div>
+        </div>
+
+        <!-- Emotional peak (setelah lilin ditiup) -->
+        <div id="emotionalPeak" class="emotional-message hidden">
+            💖 Semoga semua harapan kamu terkabul… termasuk aku di dalamnya ❤️
+        </div>
+
+        <!-- Soft closing -->
+        <div id="softClosing" class="soft-closing hidden">
+            Thank you for existing 🤍
+        </div>
+        <div class="tiny-note" id="footerNote" style="margin-top: 1.2rem;">&nbsp;</div>
+    </div>
+</div>
+
+<script>
+    // ======================= PREMIUM FLOW =======================
+    // Password preset: "uk" (aesthetic & personal)
+    const SECRET_PASSWORD = "uk";
+
+    // DOM Elements
+    const passwordScreen = document.getElementById('passwordScreen');
+    const mainScreen = document.getElementById('mainScreen');
+    const passwordInput = document.getElementById('passwordInput');
+    const submitBtn = document.getElementById('submitPasswordBtn');
+    const errorSpan = document.getElementById('passwordError');
+
+    // Main interactive elements
+    const typingArea = document.getElementById('typingArea');
+    const candleContainer = document.getElementById('candleContainer');
+    const candleEmoji = document.getElementById('candleEmoji');
+    const emotionalPeakDiv = document.getElementById('emotionalPeak');
+    const softClosingDiv = document.getElementById('softClosing');
+
+    // Flags & states
+    let typingInterval = null;
+    let isTypingComplete = false;
+    let isCandleBlown = false;
+
+    // Full letter content (heartfelt, mencakup: awal kenal, hal yang disukai, ucapan ulang tahun, harapan)
+    const fullLetter = `Assalamualaikum mitaaaa💙
+Pertama-tama aku mauu mengucapkan maaf kecil karena aku ga bikin game interaktif dan sebagainya seperti terakhir kali aku bikin buat valentine(?), karena memang di momen ulang tahun inii aku lebih mau menyampaikan banyak hal ke kamuu.
+
+Keduaa.. aku juga sebenernya sudah menyiapkan sedikit hadiah buat kamu yang seharusnya kamu bisa/uda terima saat ini juga, tapi maaf kecil lagii kadonya ga seberapaa dan akuu belum bisa membelikann salah satuu barang yang kamu pengen (bisa si, cuma mungkin lebih rajin puasa aku nextnya hehehehehehe – becanda bi <3).
+
+Ketigaa.. selanjutnya aku sudah mengusahakan juga untuk mewujudkan salah satu keinginanmu terkait *censored*, cuma aku nga bisa memastikan kalo bakal terwujud saat ini juga hehe.. mungkin kalo sampe dengan hari ini aku belum mendapat kabar, aku akan usahakan lagi sampe dapet (insyaAllah), doain yaa.
+
+Keempat.. karena pernyataan sebelumnya kayaknya lebih ke “maaf kecil” kali inii yang keempat aku lebih mau “berterimakasih besaarrrrr” atas apa yang selama ini aku rasakan dari kamuuuuu… makasih banyak ya bii kamuu sudah selalu menghargaii akuuu, pengertian bangett, support akuu selaluu, nerimaa baik dan buruknya akuu, percaya sama akuuuu, ke orang lain juga grapyak dan mudah bangett berbaurnyaa, selaluu mengusahakan untukk berubah jadi lebih baik, bawa manfaat besarr ke akuu apalagi em.. boleh diomongin ga ya - pokoknya inget aja de kamu pernah kasih apa ke aku:( , inget hal kecill *nga kyk aku (amsowi), selalu bikin situasii jadi nyamann, selalu ngedengerin akuu, random dan lucu bangett, truss selalu inget aku – padahal kan lagi ngapain gitu.., ngapernah maksa-maksaa, baik sama keluargaa akuuuu :((,mauu tau sudut pandang orang lainn, menghargaii momen-momen kecillll (shout out to ciki), selalu bisa banget diajak diskusii apapun tanpa menyakiti hati, bikin aku ngerasa berharga dan adaa banget:(… bi buanyak yang aku syukuri dan ga list satu-satu, karena jujur kalo kamu tau ini aku pas ngetik tu sambil nga ngedip dan tatapan stiker kucing syedi yang bulet itulo :(( - sebenernya ada opsi juga yang aku mau list dan jadi bahan bersyukur adalah sikap negatifnya, cuma malah bingung karena pasti suitik atau malah gaada (ini aja ga kepikiran blas) – makasi banyak banyak banyak banyak ya sayang.
+
+ai dono wich wan i shuld sey first.. ngucapin ultah atau bersyukur dulu, tapi dibagian ini aku mau mengucapkan (cie ultah) selamat bertambah usiaa yaa anak kecil kesayangan akuuuuuuuuu, selamat menempuh hidup baru (umur baru maksudnya hehe).. aku bingung mulai darimana bii karena banyak yang pengen aku sampein tapi bingung hehe, akuu pengen tau betapa bersyukurnya aku pas kamu tuing muncul di kehidupan aku dan menjadi twinnie aku bii, kamu bikin semua menjadi BUMMM! nuklir pelangi. terima kasih banyak yah bayik kesayangan akuu sudah mencintai aku dengan caraa kamuu, bikin aku nyaman, dihargai, dingertiin, dan gapernah nyerah di hubungan kita *PLIS JANGAN BI:(((((((((.. makasi banyak yaaa cantikkkkkkkkk
+
+terakhirr.. harapannya kedepan kita bisa selalu menjadi part terbaik dari diri kita selaluu yahh, dikelilingi lingkungan yang tuluss, sangatt baikkk, dan positif, sehatt lahiriyah dan batiniahh, semua doa terkabull dan impiann kamu & kita tercapaii, selalu dilindungii kapanpun-dimanapun kamu beradaa, selalu diberikan kekuatann dan kebahagiaan disegala macam keadaan, sertaa diberikan nikmat beribadah yaa, berkembang dan bertumbuhnya sama aku terus ya bii :( 
+
+jaga diri ya sayang, love u so much b.. bahkan sebenernya semua ucapan kata-kata ini nga ngabisa mengungkapkan seberapa kecintaannya aku bii <3`;
+;
+
+    // Function to start typing effect (80% impact)
+    function startTypingEffect() {
+        if (typingInterval) clearInterval(typingInterval);
+        typingArea.innerHTML = '';
+        let index = 0;
+        const text = fullLetter;
+        
+        // create cursor element
+        const cursorSpan = document.createElement('span');
+        cursorSpan.className = 'cursor';
+        cursorSpan.textContent = '';
+        typingArea.appendChild(cursorSpan);
+        
+        typingInterval = setInterval(() => {
+            if (index < text.length) {
+                // insert character before cursor
+                const currentChar = text[index];
+                const textNode = document.createTextNode(currentChar);
+                typingArea.insertBefore(textNode, cursorSpan);
+                index++;
+                // auto scroll soft
+                typingArea.scrollTop = typingArea.scrollHeight;
+            } else {
+                // typing complete
+                clearInterval(typingInterval);
+                typingInterval = null;
+                // remove cursor for clean finish
+                if (cursorSpan && cursorSpan.parentNode) cursorSpan.remove();
+                isTypingComplete = true;
+                // show candle interaction (moment kecil tapi meaningful)
+                candleContainer.classList.remove('hidden');
+                candleContainer.classList.add('fade-in-up');
+            }
+        }, 48); // slow & emotional pace
+    }
+
+    // Function untuk meniup lilin (blow candle)
+    function blowCandle() {
+        if (!isTypingComplete) return;      // belum selesai baca surat, lilin belum tersedia
+        if (isCandleBlown) return;          // hanya sekali
+        isCandleBlown = true;
+        
+        // 1. Ubah lilin jadi kepulan asap + confetti
+        candleEmoji.textContent = '💨';
+        // tambah efek transisi kecil
+        candleEmoji.style.transform = 'scale(0.95)';
+        setTimeout(() => { candleEmoji.style.transform = ''; }, 150);
+        
+        // 2. Confetti meriah (premium celebration)
+        canvasConfetti({ particleCount: 140, spread: 70, origin: { y: 0.6 }, startVelocity: 18, colors: ['#E7B89C', '#FADDC6', '#D9A17E', '#F9E0C7'] });
+        canvasConfetti({ particleCount: 40, spread: 35, origin: { y: 0.7, x: 0.3 }, startVelocity: 12 });
+        canvasConfetti({ particleCount: 40, spread: 35, origin: { y: 0.7, x: 0.7 }, startVelocity: 12 });
+        
+        // 3. Emotional peak muncul (punchline)
+        emotionalPeakDiv.classList.remove('hidden');
+        emotionalPeakDiv.classList.add('fade-in-up');
+        
+        // 4. Soft closing muncul dengan sedikit delay agar emosi 'settle'
+        setTimeout(() => {
+            softClosingDiv.classList.remove('hidden');
+            softClosingDiv.classList.add('fade-in-up');
+            // sedikit sentuhan ekstra: footnote berubah subtle
+            const footer = document.getElementById('footerNote');
+            if (footer) footer.innerHTML = '🤍 terima kasih sudah menjadi dirimu 🤍';
+        }, 380);
+        
+        // tambahan: ubah text candle container jadi lebih soft
+        const candleTextDiv = document.querySelector('#candleContainer .candle-text');
+        if (candleTextDiv) candleTextDiv.innerHTML = '✨ harapanmu telah melayang ✨';
+        
+        // Hapus event listener setelah ditiup agar tidak double
+        const clickZone = document.getElementById('candleClickZone');
+        if (clickZone) {
+            const newClickZone = clickZone.cloneNode(true);
+            clickZone.parentNode.replaceChild(newClickZone, clickZone);
+        }
+    }
+
+    // Event binding untuk candle setelah container muncul (delegation karena muncul dinamis)
+    function bindCandleEvent() {
+        const candleZone = document.getElementById('candleClickZone');
+        if (candleZone) {
+            candleZone.removeEventListener('click', blowCandle);
+            candleZone.addEventListener('click', blowCandle);
+        }
+    }
+
+    // Observasi ketika candleContainer muncul, pasang event
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                if (!candleContainer.classList.contains('hidden')) {
+                    bindCandleEvent();
+                }
+            }
+            if (mutation.type === 'childList') {
+                if (!candleContainer.classList.contains('hidden')) {
+                    bindCandleEvent();
+                }
+            }
+        });
+    });
+    observer.observe(candleContainer, { attributes: true, childList: true, subtree: true });
+    
+    // reset main screen content to fresh state (tapi dipanggil sekali setelah unlock)
+    function resetAndLoadMain() {
+        // reset flags
+        if (typingInterval) {
+            clearInterval(typingInterval);
+            typingInterval = null;
+        }
+        isTypingComplete = false;
+        isCandleBlown = false;
+        
+        // reset visual elements
+        typingArea.innerHTML = '';
+        candleContainer.classList.add('hidden');
+        emotionalPeakDiv.classList.add('hidden');
+        softClosingDiv.classList.add('hidden');
+        
+        // reset candle emoji jika sempat berubah (tapi container hidden, tetap reset state)
+        candleEmoji.textContent = '🕯️';
+        const candleTextDiv = document.querySelector('#candleContainer .candle-text');
+        if (candleTextDiv) candleTextDiv.innerHTML = 'tiup lilinnya di sini ✨';
+        const footer = document.getElementById('footerNote');
+        if (footer) footer.innerHTML = '&nbsp;';
+        
+        // start typing effect (magic)
+        startTypingEffect();
+        
+        // re-attach potential candle event after show
+        setTimeout(() => {
+            if (!candleContainer.classList.contains('hidden')) bindCandleEvent();
+        }, 100);
+    }
+    
+    // Handle password submit
+    function handlePasswordSubmit() {
+        const enteredPassword = passwordInput.value.trim();
+        if (enteredPassword === SECRET_PASSWORD) {
+            // success: unlock and show main screen
+            passwordScreen.classList.add('hidden');
+            mainScreen.classList.remove('hidden');
+            mainScreen.classList.add('fade-in-up');
+            errorSpan.textContent = '';
+            passwordInput.value = '';
+            // reset & load the whole heartfelt experience
+            resetAndLoadMain();
+        } else {
+            errorSpan.textContent = '❀ tetot salah, coba terus bii sampe sukses ❀';
+            passwordInput.style.borderColor = '#C45C4A';
+            setTimeout(() => {
+                passwordInput.style.borderColor = '#F2DFD0';
+            }, 800);
+            // shake effect subtle
+            passwordScreen.classList.add('animate-shake');
+            setTimeout(() => passwordScreen.classList.remove('animate-shake'), 400);
+        }
+    }
+    
+    // add shake style
+    const styleShake = document.createElement('style');
+    styleShake.textContent = `
+        .animate-shake {
+            animation: shake 0.3s ease-in-out 0s 2;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    `;
+    document.head.appendChild(styleShake);
+    
+    // event listener for button & enter key
+    submitBtn.addEventListener('click', handlePasswordSubmit);
+    passwordInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handlePasswordSubmit();
+        }
+    });
+    
+    // preload / optional: tidak ada auto unlock, hanya manual
+    // juga pastikan jika ada error ganda, bersihkan state ketika password benar dan mainScreen visible
+    // (initial state is password screen visible)
+    
+    // responsive: ketika lilin container muncul lagi karena reset, event tetap ada, sudah di handle oleh observer + bind
+    
+    // tambahan: jika pengguna secara tidak sengaja klik lilin sebelum typing selesai, tidak akan bereaksi karena guard di blowCandle()
+    // menambahkan efek hover pada candle container juga sudah di css
+    
+    // Memastikan ketika typing effect selesai, tapi lilin sudah terlihat, dan event sudah terpasang
+    // juga tambahan: setelah mainScreen muncul, mungkin ada interaksi tambahan dengan sentuhan premium
+    
+    // Additional polish: jika sudah selesai dan emotional peak muncul, biarkan user tidak perlu interaksi lagi
+    // — tampilan clean sudah memenuhi soft closing
+    
+    // +++++ GLOBAL OPTIMIZATION +++++
+    // mencegah memory leak dengan clearInterval jika terjadi unmount (tidak ada unmount tapi aman)
+    window.addEventListener('beforeunload', () => {
+        if (typingInterval) clearInterval(typingInterval);
+    });
+    
+    // Bonus: jika mainScreen sudah tampil dan pengguna melakukan refresh? password screen akan kembali (standar)
+    // supaya eksklusif tetap terjaga
+    console.log('✨ Surat spesial siap — password: love ✨');
+</script>
+</body>
+</html>
